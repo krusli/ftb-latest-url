@@ -78,7 +78,7 @@ app.get('/mods', async (req, res) => {
     const promiseAll = Promise.all(promises);
 
     const links = await promiseAll;
-    res.send(links);
+    res.send(links.join('\n'));
 })
 
 const port = process.env.PORT || 8080;
