@@ -8,8 +8,8 @@ const express = require('express');
 const http = require('follow-redirects').http;
 const https = require('follow-redirects').https;
 
-const base = 'https://www.feed-the-beast.com';
-const filesUrl = `${base}/projects/ftb-revelation/files`;
+const serverBase = 'https://www.feed-the-beast.com';
+const filesUrl = `${serverBase}/projects/ftb-revelation/files`;
 
 async function getPage(url) {
     const response = await axios.get(url, { responseType: 'arraybuffer' });
@@ -17,7 +17,7 @@ async function getPage(url) {
     return buffer.toString();
 }
 
-function getUrl(uri) {
+function getUrl(base, uri) {
     return `${base}${uri}`;
 }
 
@@ -34,12 +34,33 @@ async function getLatest() {
     const projectFiles = $('.project-file-list-item').map((i, elem) => $(elem));
     const latest = projectFiles[0];
     $ = cheerio.load(latest.html());
-    const latestServerPageUrl = getUrl($('.more-files-tag').attr('href'));
+    const latestServerPageUrl = getUrl(serverBase, $('.more-files-tag').attr('href'));
 
     // get the download link
     $ = cheerio.load(await getPage(latestServerPageUrl));
-    const downloadUrl = getUrl($('.button.tip').attr('href'));
+    const downloadUrl = getUrl(serverBase, $('.button.tip').attr('href'));
 
+    // follow the redirect to the actual CDN download link
+    const cdnUrl = (await httpsGet(downloadUrl)).responseUrl;
+    return cdnUrl;
+}
+
+const modsProjects = 'https://minecraft.curseforge.com/projects/';
+const modsBase = 'https://minecraft.curseforge.com/';
+const mods = [
+    'plustic',
+    'randompatches',
+    'mouse-tweaks',
+    'squake',
+    'rftools-dimensions',
+    'tf2-stuff-mod'
+]
+async function getModUrl(mod) {
+    const url = `${modsProjects}${mod}`
+    let $ = cheerio.load(await getPage(url));
+
+    const downloadUrl = getUrl(modsBase, $('.categories-container a').attr('href'));
+   
     // follow the redirect to the actual CDN download link
     const cdnUrl = (await httpsGet(downloadUrl)).responseUrl;
     return cdnUrl;
@@ -48,8 +69,16 @@ async function getLatest() {
 const app = express();
 app.use(helmet());
 
-app.get('*', async (req, res) => {
+app.get('/', async (req, res) => {
     res.send(await getLatest());
+})
+
+app.get('/mods', async (req, res) => {
+    const promises = mods.map(mod => getModUrl(mod));
+    const promiseAll = Promise.all(promises);
+
+    const links = await promiseAll;
+    res.send(links);
 })
 
 const port = process.env.PORT || 8080;
