@@ -48,6 +48,8 @@ async function getLatest() {
 const modsProjects = 'https://minecraft.curseforge.com/projects/';
 const modsBase = 'https://minecraft.curseforge.com/';
 const mods = [
+    'mcjtylib',
+    'rftools',
     'plustic',
     'randompatches',
     'mouse-tweaks',
