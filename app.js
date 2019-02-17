@@ -2,6 +2,7 @@
 // const helmet = require('helmet');
 const cheerio = require('cheerio');
 const axios = require('axios');
+const helmet = require('helmet');
 const http = require('follow-redirects').http;
 const https = require('follow-redirects').https;
 
@@ -39,7 +40,15 @@ async function getLatest() {
 
     // follow the redirect to the actual CDN download link
     const cdnUrl = (await httpsGet(downloadUrl)).responseUrl;
-    console.log(cdnUrl);
+    return cdnUrl;
 }
 
-getLatest();
+const app = express();
+app.use(helmet());
+
+app.get('*', async (req, res) => {
+    res.send(await getLatest());
+})
+
+const port = process.env.PORT || 8080;
+app.listen(port);
