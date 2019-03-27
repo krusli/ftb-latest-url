@@ -55,7 +55,8 @@ const mods = [
     'mouse-tweaks',
     'squake',
     'rftools-dimensions',
-    'tf2-stuff-mod'
+    'tf2-stuff-mod',
+    'energy-converters'
 ]
 async function getModUrl(mod) {
     const url = `${modsProjects}${mod}`
