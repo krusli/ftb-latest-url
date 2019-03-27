@@ -56,7 +56,8 @@ const mods = [
     'squake',
     'rftools-dimensions',
     'tf2-stuff-mod',
-    'energy-converters'
+    'energy-converters',
+    'mekanism'
 ]
 async function getModUrl(mod) {
     const url = `${modsProjects}${mod}`
