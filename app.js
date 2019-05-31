@@ -49,16 +49,16 @@ async function getLatest() {
 const modsProjects = 'https://minecraft.curseforge.com/projects/';
 const modsBase = 'https://minecraft.curseforge.com/';
 const mods = [
-    { name: 'mcjtylib' },
+    { name: 'mcjtylib', version: 'McJtyLib - 1.12-3.5.3' },
     { name: 'rftools', version: 'RFTools - 1.12-7.71' },
-    { name: 'plustic' },
-    { name: 'randompatches' },
-    { name: 'mouse-tweaks' },
-    { name: 'squake' },
-    { name: 'rftools-dimensions' },
-    { name: 'tf2-stuff-mod' },
-    { name: 'energy-converters' },
-    { name: 'mekanism' }
+    { name: 'plustic', version: 'plustic-7.0.7.0.jar' },
+    { name: 'randompatches', version: 'RandomPatches 1.12.2-1.15.1.0' },
+    { name: 'mouse-tweaks', version: '[1.12.2] Mouse Tweaks 2.10' },
+    { name: 'squake', version: 'Squake-mc1.12.2-1.0.6.jar' },
+    { name: 'rftools-dimensions', version: 'RFToolsDimensions - 1.12-5.71' },
+    { name: 'tf2-stuff-mod', version: 'rafradek_tf2_weapons-1.12.2-1.5.12.jar' },
+    { name: 'energy-converters', version: 'energyconverters_1.12.2-1.3.0.15.jar' },
+    // { name: 'mekanism' }
 ];
 
 async function getModUrl(mod, nPages, pageNo=1) {
