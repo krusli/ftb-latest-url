@@ -11,6 +11,7 @@ const https = require('follow-redirects').https;
 const serverBase = 'https://www.feed-the-beast.com';
 const filesUrl = `${serverBase}/projects/ftb-revelation/files`;
 
+/* Utils */
 async function getPage(url) {
     const response = await axios.get(url, { responseType: 'arraybuffer' });
     const buffer = new Buffer.from(response.data, 'binary');
@@ -27,6 +28,8 @@ function httpsGet(url) {
     })
 }
 
+/* Scrapers */
+// just get the latest one
 async function getLatest() {
     let $ = cheerio.load(await getPage(filesUrl));
 
@@ -44,6 +47,20 @@ async function getLatest() {
     // follow the redirect to the actual CDN download link
     const cdnUrl = (await httpsGet(downloadUrl)).responseUrl;
     return cdnUrl;
+}
+
+// https://www.feed-the-beast.com/projects/ftb-revelation/files/2712061 (FTBRevelation-3.0.1-1.12.2.zip)
+// gets a specific frozen version of FTB Revelation
+async function getFtbRevelation() {
+  let $ = cheerio.load(await getPage('https://www.feed-the-beast.com/projects/ftb-revelation/files/2712061'));
+
+  // get the download link
+  const uri = $('.project-file-download-button-large .button').attr('href');
+  const downloadUrl = getUrl(serverBase, uri);
+
+  // get the CDN URL (after a HTTP redirect)
+  const cdnUrl = (await httpsGet(downloadUrl)).responseUrl; 
+  return cdnUrl;
 }
 
 const modsProjects = 'https://minecraft.curseforge.com/projects/';
@@ -137,7 +154,8 @@ const app = express();
 app.use(helmet());
 
 app.get('/', async (req, res) => {
-    res.send(await getLatest());
+    // res.send(await getLatest());
+    res.send(await getFtbRevelation());
 })
 
 app.get('/mods', async (req, res) => {
