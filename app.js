@@ -52,7 +52,7 @@ async function getLatest() {
 // https://www.feed-the-beast.com/projects/ftb-revelation/files/2712061 (FTBRevelation-3.0.1-1.12.2.zip)
 // gets a specific frozen version of FTB Revelation
 async function getFtbRevelation() {
-  let $ = cheerio.load(await getPage('https://www.feed-the-beast.com/projects/ftb-revelation/files/2712061'));
+  let $ = cheerio.load(await getPage('https://www.feed-the-beast.com/projects/ftb-revelation/files/2712063'));
 
   // get the download link
   const uri = $('.project-file-download-button-large .button').attr('href');
