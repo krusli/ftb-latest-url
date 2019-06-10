@@ -76,9 +76,13 @@ const mods = [
     { name: 'tf2-stuff-mod', version: 'rafradek_tf2_weapons-1.12.2-1.5.12.jar' },
     { name: 'energy-converters', version: 'energyconverters_1.12.2-1.3.0.15.jar' },
     { name: 'chicken-chunks-1-8', version: 'Chicken Chunks 1.12.2-2.4.1.73-universal' },
-    { name: 'compact-machines', version: 'compactmachines3- 1.12.2 - 3.0.18 - b278.jar' },
-    { name: 'tiquality', version: 'Tiquality- FAT - 1.12.2 - GAMMA - 1.4.3.jar' }
+    { name: 'compact-machines', version: 'compactmachines3-1.12.2-3.0.18-b278.jar' },
+    { name: 'tiquality', version: 'Tiquality-FAT-1.12.2-GAMMA-1.4.3.jar' }
     // { name: 'mekanism' }
+
+    
+
+
 ];
 
 async function getModUrl(mod, nPages, pageNo=1) {
