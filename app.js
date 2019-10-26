@@ -95,29 +95,29 @@ const mods = [
 
 async function getModUrl(mod, nPages, pageNo = 1) {
     // console.log('getModUrl()', mod, nPages, pageNo);
-    console.log('getModUrl()', mod.name);
+    // console.log('getModUrl()', mod.name);
     const url = `${modsProjects}${mod.name}${mod.version ? `/files/all?page=${pageNo}` : ''}`;
-    console.log(url);
+    // console.log(url);
     const $ = cheerio.load(await getPage(url));
-    console.log(`Got page for ${mod}`);
+    // console.log(`Got page for ${mod}`);
 
     let downloadUrl;
     if (!mod.version) {
-        console.log('Version not set. Going to get the latest version instead');
+        // console.log('Version not set. Going to get the latest version instead');
         // TODO not fixed for Curse's last update
         downloadUrl = getUrl(modsBase, $('.categories-container a').attr('href'));
     } else {
         const links = [];
 
-        console.log(`We have ${nPages} pages`);
+        // console.log(`We have ${nPages} pages`);
 
         // get the number of pages (for checking at the tail of the recursive call if we've reached the end of the list)
         if (!nPages) {
             let items = []
-            $('.ml-auto .pagination-top').each((i, elem) => {
+            $('.ml-auto .pagination-top').map((i, elem) => {
                 const x = $('a',elem);
-                console.log(x.attr('href'));
-                console.log(x.html())
+                // console.log(x.attr('href'));
+                // console.log(x.html())
                 items.push(x.attr('href'));
             });
 
@@ -131,7 +131,7 @@ async function getModUrl(mod, nPages, pageNo = 1) {
             });
 
             nPages = max;
-            console.log(`Got ${nPages} pages`);
+            // console.log(`Got ${nPages} pages`);
         }
 
         $('.listing-body .project-file-listing tbody tr')
@@ -151,7 +151,7 @@ async function getModUrl(mod, nPages, pageNo = 1) {
             return link.version == mod.version
         });
 
-        console.log('getModUrl()2', mod, nPages, pageNo);
+        // console.log('getModUrl()2', mod, nPages, pageNo);
 
         if (matchIfAny) {
             downloadUrl = getUrl(modsBase, matchIfAny.uri)
@@ -186,15 +186,15 @@ app.get('/', async (req, res) => {
 })
 
 app.get('/mods', async (req, res) => {
-    // const promises = mods.map(mod => getModUrl(mod));
-    // const promiseAll = Promise.all(promises);
-    // const links = await promiseAll;
+    const promises = mods.map(mod => getModUrl(mod));
+    const promiseAll = Promise.all(promises);
+    const links = await promiseAll;
 
-    const links = [];
-    for (let i = 0; i < mods.length; i++) {
-        const link = await getModUrl(mods[i]);
-        links.push(link);
-    }
+    // const links = [];
+    // for (let i = 0; i < mods.length; i++) {
+    //     const link = await getModUrl(mods[i]);
+    //     links.push(link);
+    // }
 
     res.send(links.join('\r\n'));
 })
