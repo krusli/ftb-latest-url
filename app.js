@@ -22,7 +22,6 @@ async function getPage(url) {
         'Accept': '*/*'},
         jar: requestModule.jar()
     };
-    cloudflarescraper.debug=true;
     const response = await cloudflarescraper.defaults().get(options);
     const buffer = new Buffer.from(response,'binary');
     return buffer.toString();
@@ -77,18 +76,16 @@ async function getFtbRevelation() {
 const modsProjects = 'https://www.curseforge.com/minecraft/mc-mods/';
 const modsBase = 'https://www.curseforge.com';
 const mods = [
-    { name: 'mcjtylib', version: 'McJtyLib - 1.12-3.5.3' },
-    { name: 'rftools', version: 'RFTools - 1.12-7.71' },
-    { name: 'plustic', version: 'plustic-7.0.7.0.jar' },
-    { name: 'randompatches', version: 'RandomPatches 1.12.2-1.15.1.0' },
+    { name: 'mcjtylib', version: 'McJtyLib - 1.12-3.5.4' },
+    { name: 'rftools', version: 'RFTools - 1.12-7.72' },
+    { name: 'plustic', version: 'plustic-7.1.6.1.jar' },
+    { name: 'randompatches', version: 'RandomPatches 1.12.2-1.19.1.1' },
     { name: 'mouse-tweaks', version: '[1.12.2] Mouse Tweaks 2.10' },
-    { name: 'squake', version: 'Squake-mc1.12.2-1.0.6.jar' },
     { name: 'rftools-dimensions', version: 'RFToolsDimensions - 1.12-5.71' },
-    { name: 'tf2-stuff-mod', version: 'rafradek_tf2_weapons-1.12.2-1.5.12.jar' },
-    { name: 'energy-converters', version: 'energyconverters_1.12.2-1.3.0.15.jar' },
-    { name: 'chicken-chunks-1-8', version: 'Chicken Chunks 1.12.2-2.4.1.73-universal' },
+    { name: 'energy-converters', version: 'energyconverters_1.12.2-1.3.3.19.jar' },
+    { name: 'chicken-chunks-1-8', version: 'Chicken Chunks 1.12.2-2.4.2.74-universal' },
     { name: 'compact-machines', version: 'compactmachines3-1.12.2-3.0.18-b278.jar' },
-    { name: 'tiquality', version: 'Tiquality-FAT-1.12.2-GAMMA-1.4.3.jar' }
+    { name: 'tiquality', version: 'Tiquality-FAT-1.12.2-GAMMA-1.7.2.jar' }
     // { name: 'mekanism' }
 
 
@@ -116,9 +113,7 @@ async function getModUrl(mod, nPages, pageNo = 1) {
 
         // get the number of pages (for checking at the tail of the recursive call if we've reached the end of the list)
         if (!nPages) {
-            console.log('Fetching total no of pages');
             let items = []
-            console.log($('.pagination-top').children().length);
             $('.ml-auto .pagination-top').each((i, elem) => {
                 const x = $('a',elem);
                 console.log(x.attr('href'));
@@ -141,9 +136,8 @@ async function getModUrl(mod, nPages, pageNo = 1) {
 
         $('.listing-body .project-file-listing tbody tr')
             .map((i, elem) => {
-                const row = $('td',elem);
-                const version = $('a, #file-link', elem).text();
-                const uri = $('.button--hollow').attr('href');
+                const version = $('a, #file-link', elem).text().split('\n')[0].split('+')[0];
+                const uri = $('a, .button--hollow',elem).attr('href');
 
                 // get the URL of the download button
                 // const uri = $('.project-file-download-button .button').attr('href');
