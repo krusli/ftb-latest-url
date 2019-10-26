@@ -50,21 +50,22 @@ async function getLatest() {
 }
 
 // https://www.feed-the-beast.com/projects/ftb-revelation/files/2712061 (FTBRevelation-3.0.1-1.12.2.zip)
+// Eldcerust note: Update requested to version FTB Revelation 3.2.0
 // gets a specific frozen version of FTB Revelation
 async function getFtbRevelation() {
-  let $ = cheerio.load(await getPage('https://www.feed-the-beast.com/projects/ftb-revelation/files/2712063'));
+    let $ = cheerio.load(await getPage('https://www.feed-the-beast.com/projects/ftb-revelation/files/2778975'));
 
-  // get the download link
-  const uri = $('.project-file-download-button-large .button').attr('href');
-  const downloadUrl = getUrl(serverBase, uri);
+    // get the download link
+    const uri = $('.project-file-download-button-large .button').attr('href');
+    const downloadUrl = getUrl(serverBase, uri);
 
-  // get the CDN URL (after a HTTP redirect)
-  const cdnUrl = (await httpsGet(downloadUrl)).responseUrl; 
-  return cdnUrl;
+    // get the CDN URL (after a HTTP redirect)
+    const cdnUrl = (await httpsGet(downloadUrl)).responseUrl;
+    return cdnUrl;
 }
-
-const modsProjects = 'https://minecraft.curseforge.com/projects/';
-const modsBase = 'https://minecraft.curseforge.com/';
+// https://www.curseforge.com/minecraft/mc-mods/mcjtylib/files/all
+const modsProjects = 'https://www.curseforge.com/minecraft/mc-mods/';
+const modsBase = 'https://www.curseforge.com';
 const mods = [
     { name: 'mcjtylib', version: 'McJtyLib - 1.12-3.5.3' },
     { name: 'rftools', version: 'RFTools - 1.12-7.71' },
@@ -80,14 +81,14 @@ const mods = [
     { name: 'tiquality', version: 'Tiquality-FAT-1.12.2-GAMMA-1.4.3.jar' }
     // { name: 'mekanism' }
 
-    
+
 
 
 ];
 
-async function getModUrl(mod, nPages, pageNo=1) {
+async function getModUrl(mod, nPages, pageNo = 1) {
     console.log('getModUrl()', mod, nPages, pageNo);
-    const url = `${modsProjects}${mod.name}${mod.version ? `/files?page=${pageNo}` : ''}`;
+    const url = `${modsProjects}${mod.name}${mod.version ? `/files/all?page=${pageNo}` : ''}`;
     const $ = cheerio.load(await getPage(url));
 
     let downloadUrl;
@@ -99,7 +100,7 @@ async function getModUrl(mod, nPages, pageNo=1) {
         // get the number of pages (for checking at the tail of the recursive call if we've reached the end of the list)
         if (!nPages) {
             let items = []
-            $('.listing-header .b-pagination-item a').map((i, elem) => {
+            $('.pagination .pagination-item a').map((i, elem) => {
                 const x = $(elem);
                 items.push(x.attr('href'))
             });
@@ -115,19 +116,20 @@ async function getModUrl(mod, nPages, pageNo=1) {
 
             nPages = max;
         }
-        
-        $('.listing-body .project-file-list-item')
-        .map((i, elem) => {
-            const linkElem = $('.twitch-link', elem);
-            const version = linkElem.html();
 
-            // get the URL of the download button
-            const uri = $('.project-file-download-button .button').attr('href');
-            links.push({
-                version,
-                uri
-            });
-        })
+        $('.listing-body .project-file-listing tbody tr')
+            .map((i, elem) => {
+                const linkElem = $('#file-link', elem);
+                const version = linkElem.html();
+                const uri = $('.button--hollow').attr('href');
+
+                // get the URL of the download button
+                // const uri = $('.project-file-download-button .button').attr('href');
+                links.push({
+                    version,
+                    uri
+                });
+            })
 
         const matchIfAny = links.find(link => {
             return link.version == mod.version
@@ -139,13 +141,13 @@ async function getModUrl(mod, nPages, pageNo=1) {
             // if no match, try checking the next page
             if (pageNo != nPages) {
                 // check the next page
-                return await getModUrl(mod, nPages, pageNo+1);
+                return await getModUrl(mod, nPages, pageNo + 1);
             }
-            
+
             // else
             // no more work left to be done, mod not found.
             return null;
-            
+
         }
     }
 
