@@ -102,7 +102,7 @@ const mods = [
     { name: 'mcjtylib', version: 'McJtyLib - 1.12-3.5.4' },
     { name: 'rftools', version: 'RFTools - 1.12-7.72' },
     { name: 'plustic', version: 'plustic-7.1.6.1.jar' },
-    { name: 'randompatches', version: 'RandomPatches 1.12.2-1.19.1.1' },
+    // { name: 'randompatches', version: 'RandomPatches 1.12.2-1.19.1.1' }, // NOTE: randompatches now a part of FTB Revelation, don't duplicate versions
     { name: 'mouse-tweaks', version: '[1.12.2] Mouse Tweaks 2.10' },
     { name: 'rftools-dimensions', version: 'RFToolsDimensions - 1.12-5.71' },
     { name: 'energy-converters', version: 'energyconverters_1.12.2-1.3.3.19.jar' },
