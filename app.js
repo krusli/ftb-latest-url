@@ -14,6 +14,10 @@ const https = require('follow-redirects').https;
 const serverBase = 'https://www.feed-the-beast.com';
 const filesUrl = `${serverBase}/projects/ftb-revelation/files`;
 
+/* Consts */
+// const cdnUrlBase = 'https://media.forgecdn.net/files/2804/30/jei-1.14.4-6.0.0.18.jar';
+const cdnUrlBase = 'https://media.forgecdn.net/files/'; // "currying": this string is incomplete, needs the IDs and filename.
+
 /* Utils */
 async function getPage(url) {
     var options = {
@@ -38,26 +42,6 @@ function httpsGet(url) {
 }
 
 /* Scrapers */
-// just get the latest one
-async function getLatest() {
-    let $ = cheerio.load(await getPage(filesUrl));
-
-    // get the link to the latest server files page
-    const projectFiles = $('.project-file-list-item').map((i, elem) => $(elem));
-    const latest = projectFiles[0];
-
-    $ = cheerio.load(latest.html());
-    const latestServerPageUrl = getUrl(serverBase, $('.more-files-tag').attr('href'));
-
-    // get the download link
-    $ = cheerio.load(await getPage(latestServerPageUrl));
-    const downloadUrl = getUrl(serverBase, $('.button.tip').attr('href'));
-
-    // follow the redirect to the actual CDN download link
-    const cdnUrl = (await httpsGet(downloadUrl)).responseUrl;
-    return cdnUrl;
-}
-
 // https://www.feed-the-beast.com/projects/ftb-revelation/files/2712061 (FTBRevelation-3.0.1-1.12.2.zip)
 // Eldcerust note: Update requested to version FTB Revelation 3.2.0
 // gets a specific frozen version of FTB Revelation
@@ -173,15 +157,38 @@ async function getModUrl(mod, nPages, pageNo = 1) {
     if (!downloadUrl) {
         return;
     }
-    const cdnUrl = (await httpsGet(downloadUrl)).responseUrl;
-    return cdnUrl;
+
+    const downloadPageUrl = (await httpsGet(downloadUrl)).responseUrl;
+
+    function getIdUri(idUnified) {
+        // assumption: 4 + 3 = 7
+        length = idUnified.length;
+        
+        // assumption, if length > 7, the first part of the uri (a/b -> a) will change, and b's length will not
+        const idFirst = idUnified.slice(0, length - 3);
+        const idSecond = idUnified.slice(length - 3, length);
+
+        return `${idFirst}/${idSecond}`;
+    }
+
+    /**
+     * Constructs the actual CDN download link, based on an educated guess of the ID formatting.
+     */
+    function getCdnUrl(downloadPageUrl) {
+        const idUnified = downloadPageUrl.split('/').pop();    // last part of URL, assumption: no params (?a=b&c=d)
+
+        return `${cdnUrlBase}${getIdUri(idUnified)}/TODO.jar`
+    }
+    // console.log(cdnUrl);
+    // return cdnUrl;
+
+    return getCdnUrl(downloadPageUrl);
 }
 
 const app = express();
 app.use(helmet());
 
 app.get('/', async (req, res) => {
-    // res.send(await getLatest());
     res.send(await getFtbRevelation());
 })
 
@@ -197,14 +204,6 @@ app.get('/mods', async (req, res) => {
     // }
 
     res.send(links.join('\r\n'));
-})
-
-app.get('/mods-debug', async (req, res) => {
-    const promises = mods.map(mod => getModUrl(mod));
-    const promiseAll = Promise.all(promises);
-    const links = await promiseAll;
-
-    res.json(links);
 })
 
 const port = process.env.PORT || 3000;
