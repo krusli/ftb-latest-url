@@ -41,6 +41,41 @@ function httpsGet(url) {
     })
 }
 
+function getIdUri(idUnified) {
+    // assumption: 4 + 3 = 7
+    length = idUnified.length;
+
+    // assumption, if length > 7, the first part of the uri (a/b -> a) will change, and b's length will not
+    const idFirst = idUnified.slice(0, length - 3);
+    const idSecond = idUnified.slice(length - 3, length);
+
+    return `${idFirst}/${idSecond}`;
+}
+
+/**
+ * Constructs the actual CDN download link, based on an educated guess of the ID formatting.
+ */
+function getCdnUrl(downloadPageUrl, filename) {
+    const idUnified = downloadPageUrl.split("/").pop(); // last part of URL, assumption: no params (?a=b&c=d)
+
+    return `${cdnUrlBase}${getIdUri(idUnified)}/${filename}`;
+}
+
+async function getCdnUrlFromDownloadUrl(downloadPageUrl) {
+    // We also need the filename. To do that, we need to fetch the download page from downloadPageUrl
+    const downloadPage$ = cheerio.load(await getPage(downloadPageUrl));
+
+    let entries = downloadPage$("main article .text-sm:nth-child(2)");
+    let filename = downloadPage$(entries[0]).text();
+
+    if (!filename) {
+       elem = downloadPage$(".details-info li:nth-child(1) .overflow-tip"); 
+       filename = downloadPage$(elem).text();
+    }
+
+    return getCdnUrl(downloadPageUrl, filename);
+}
+
 /* Scrapers */
 // https://www.feed-the-beast.com/projects/ftb-revelation/files/2712061 (FTBRevelation-3.0.1-1.12.2.zip)
 // Eldcerust note: Update requested to version FTB Revelation 3.2.0
@@ -53,9 +88,13 @@ async function getFtbRevelation() {
     const downloadUrl = getUrl(serverBase, uri);
 
     // get the CDN URL (after a HTTP redirect)
-    const cdnUrl = (await httpsGet(downloadUrl)).responseUrl;
-    return cdnUrl;
+    const downloadLinkUrl = (await httpsGet(downloadUrl)).responseUrl;
+    const split = downloadLinkUrl.split('/');
+    const downloadPageUrl = split.splice(0, split.length - 1).join('/');
+
+    return await getCdnUrlFromDownloadUrl(downloadPageUrl);
 }
+
 // https://www.curseforge.com/minecraft/mc-mods/mcjtylib/files/all
 const modsProjects = 'https://www.curseforge.com/minecraft/mc-mods/';
 const modsBase = 'https://www.curseforge.com';
@@ -160,34 +199,7 @@ async function getModUrl(mod, nPages, pageNo = 1) {
 
     const downloadPageUrl = (await httpsGet(downloadUrl)).responseUrl;
 
-    function getIdUri(idUnified) {
-        // assumption: 4 + 3 = 7
-        length = idUnified.length;
-        
-        // assumption, if length > 7, the first part of the uri (a/b -> a) will change, and b's length will not
-        const idFirst = idUnified.slice(0, length - 3);
-        const idSecond = idUnified.slice(length - 3, length);
-
-        return `${idFirst}/${idSecond}`;
-    }
-
-    // We also need the filename. To do that, we need to fetch the download page from downloadPageUrl
-    const downloadPage$ = cheerio.load(await getPage(downloadPageUrl));
-
-    const entries = downloadPage$("main article .text-sm:nth-child(2)");
-    const filename = downloadPage$(entries[0]).text();
-
-    
-    /**
-     * Constructs the actual CDN download link, based on an educated guess of the ID formatting.
-     */
-    function getCdnUrl(downloadPageUrl, filename) {
-        const idUnified = downloadPageUrl.split('/').pop();    // last part of URL, assumption: no params (?a=b&c=d)
-
-        return `${cdnUrlBase}${getIdUri(idUnified)}/${filename}`
-    }
-
-    return getCdnUrl(downloadPageUrl, filename);
+    return await getCdnUrlFromDownloadUrl(downloadPageUrl);
 }
 
 const app = express();
