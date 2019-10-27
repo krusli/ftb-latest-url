@@ -171,18 +171,23 @@ async function getModUrl(mod, nPages, pageNo = 1) {
         return `${idFirst}/${idSecond}`;
     }
 
+    // We also need the filename. To do that, we need to fetch the download page from downloadPageUrl
+    const downloadPage$ = cheerio.load(await getPage(downloadPageUrl));
+
+    const entries = downloadPage$("main article .text-sm:nth-child(2)");
+    const filename = downloadPage$(entries[0]).text();
+
+    
     /**
      * Constructs the actual CDN download link, based on an educated guess of the ID formatting.
      */
-    function getCdnUrl(downloadPageUrl) {
+    function getCdnUrl(downloadPageUrl, filename) {
         const idUnified = downloadPageUrl.split('/').pop();    // last part of URL, assumption: no params (?a=b&c=d)
 
-        return `${cdnUrlBase}${getIdUri(idUnified)}/TODO.jar`
+        return `${cdnUrlBase}${getIdUri(idUnified)}/${filename}`
     }
-    // console.log(cdnUrl);
-    // return cdnUrl;
 
-    return getCdnUrl(downloadPageUrl);
+    return getCdnUrl(downloadPageUrl, filename);
 }
 
 const app = express();
