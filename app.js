@@ -64,7 +64,7 @@ async function getLatest() {
 async function getFtbRevelation() {
 
     // get the CDN URL (after a HTTP redirect)
-    const cdnUrl = 'https://media.forgecdn.net/files/2778/969/FTBRevelation-3.2.0-1.12.2.zip';
+    const cdnUrl = 'https://media.forgecdn.net/files/2778/975/FTBRevelationServer_3.2.0.zip';
     return cdnUrl;
 }
 // https://www.curseforge.com/minecraft/mc-mods/mcjtylib/files/all
