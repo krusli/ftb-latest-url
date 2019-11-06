@@ -14,6 +14,10 @@ const https = require('follow-redirects').https;
 const serverBase = 'https://www.feed-the-beast.com';
 const filesUrl = `${serverBase}/projects/ftb-revelation/files`;
 
+/* Consts */
+// const cdnUrlBase = 'https://media.forgecdn.net/files/2804/30/jei-1.14.4-6.0.0.18.jar';
+const cdnUrlBase = 'https://media.forgecdn.net/files/'; // "currying": this string is incomplete, needs the IDs and filename.
+
 /* Utils */
 async function getPage(url) {
     var options = {
@@ -37,36 +41,60 @@ function httpsGet(url) {
     })
 }
 
-/* Scrapers */
-// just get the latest one
-async function getLatest() {
-    let $ = cheerio.load(await getPage(filesUrl));
+function getIdUri(idUnified) {
+    // assumption: 4 + 3 = 7
+    length = idUnified.length;
 
-    // get the link to the latest server files page
-    const projectFiles = $('.project-file-list-item').map((i, elem) => $(elem));
-    const latest = projectFiles[0];
+    // assumption, if length > 7, the first part of the uri (a/b -> a) will change, and b's length will not
+    const idFirst = idUnified.slice(0, length - 3);
+    const idSecond = idUnified.slice(length - 3, length);
 
-    $ = cheerio.load(latest.html());
-    const latestServerPageUrl = getUrl(serverBase, $('.more-files-tag').attr('href'));
-
-    // get the download link
-    $ = cheerio.load(await getPage(latestServerPageUrl));
-    const downloadUrl = getUrl(serverBase, $('.button.tip').attr('href'));
-
-    // follow the redirect to the actual CDN download link
-    const cdnUrl = (await httpsGet(downloadUrl)).responseUrl;
-    return cdnUrl;
+    return `${idFirst}/${idSecond}`;
 }
 
+/**
+ * Constructs the actual CDN download link, based on an educated guess of the ID formatting.
+ */
+function getCdnUrl(downloadPageUrl, filename) {
+    const idUnified = downloadPageUrl.split("/").pop(); // last part of URL, assumption: no params (?a=b&c=d)
+
+    return `${cdnUrlBase}${getIdUri(idUnified)}/${filename}`;
+}
+
+async function getCdnUrlFromDownloadUrl(downloadPageUrl) {
+    // We also need the filename. To do that, we need to fetch the download page from downloadPageUrl
+    const downloadPage$ = cheerio.load(await getPage(downloadPageUrl));
+
+    let entries = downloadPage$("main article .text-sm:nth-child(2)");
+    let filename = downloadPage$(entries[0]).text();
+
+    if (!filename) {
+       elem = downloadPage$(".details-info li:nth-child(1) .overflow-tip"); 
+       filename = downloadPage$(elem).text();
+    }
+
+    return getCdnUrl(downloadPageUrl, filename);
+}
+
+/* Scrapers */
 // https://www.feed-the-beast.com/projects/ftb-revelation/files/2712061 (FTBRevelation-3.0.1-1.12.2.zip)
 // Eldcerust note: Update requested to version FTB Revelation 3.2.0
 // gets a specific frozen version of FTB Revelation
 async function getFtbRevelation() {
+    let $ = cheerio.load(await getPage('https://www.feed-the-beast.com/projects/ftb-revelation/files/2778975'));
+
+    // get the download link
+    const uri = $('.project-file-download-button-large .button').attr('href');
+    const downloadUrl = getUrl(serverBase, uri);
 
     // get the CDN URL (after a HTTP redirect)
-    const cdnUrl = 'https://media.forgecdn.net/files/2778/975/FTBRevelationServer_3.2.0.zip';
-    return cdnUrl;
+    const downloadLinkUrl = (await httpsGet(downloadUrl)).responseUrl;
+    const split = downloadLinkUrl.split('/');
+    const downloadPageUrl = split.splice(0, split.length - 1).join('/');
+
+    return await getCdnUrlFromDownloadUrl(downloadPageUrl);
 }
+
 // https://www.curseforge.com/minecraft/mc-mods/mcjtylib/files/all
 const modsProjects = 'https://www.curseforge.com/minecraft/mc-mods/';
 const modsBase = 'https://www.curseforge.com';
@@ -74,15 +102,13 @@ const mods = [
     { name: 'mcjtylib', version: 'McJtyLib - 1.12-3.5.4' },
     { name: 'rftools', version: 'RFTools - 1.12-7.72' },
     { name: 'plustic', version: 'plustic-7.1.6.1.jar' },
-    { name: 'randompatches', version: 'RandomPatches 1.12.2-1.19.1.1' },
+    // { name: 'randompatches', version: 'RandomPatches 1.12.2-1.19.1.1' }, // NOTE: randompatches now a part of FTB Revelation, don't duplicate versions
     { name: 'mouse-tweaks', version: '[1.12.2] Mouse Tweaks 2.10' },
     { name: 'rftools-dimensions', version: 'RFToolsDimensions - 1.12-5.71' },
     { name: 'energy-converters', version: 'energyconverters_1.12.2-1.3.3.19.jar' },
     { name: 'chicken-chunks-1-8', version: 'Chicken Chunks 1.12.2-2.4.2.74-universal' },
     { name: 'compact-machines', version: 'compactmachines3-1.12.2-3.0.18-b278.jar' },
-    { name: 'tiquality', version: 'Tiquality-FAT-1.12.2-GAMMA-1.7.2.jar' },
-    { name: 'tick-dynamic', version: 'TickDynamic-1.12.2-1.0.2' },
-    { name: 'pvptoggle', version: 'pvpToggle-1.12.1-2.0.38-universal.jar' }
+    { name: 'tiquality', version: 'Tiquality-FAT-1.12.2-GAMMA-1.7.2.jar' }
     // { name: 'mekanism' }
 
 
@@ -170,15 +196,16 @@ async function getModUrl(mod, nPages, pageNo = 1) {
     if (!downloadUrl) {
         return;
     }
-    const cdnUrl = (await httpsGet(downloadUrl)).responseUrl;
-    return cdnUrl;
+
+    const downloadPageUrl = (await httpsGet(downloadUrl)).responseUrl;
+
+    return await getCdnUrlFromDownloadUrl(downloadPageUrl);
 }
 
 const app = express();
 app.use(helmet());
 
 app.get('/', async (req, res) => {
-    // res.send(await getLatest());
     res.send(await getFtbRevelation());
 })
 
@@ -194,14 +221,6 @@ app.get('/mods', async (req, res) => {
     // }
 
     res.send(links.join('\r\n'));
-})
-
-app.get('/mods-debug', async (req, res) => {
-    const promises = mods.map(mod => getModUrl(mod));
-    const promiseAll = Promise.all(promises);
-    const links = await promiseAll;
-
-    res.json(links);
 })
 
 const port = process.env.PORT || 3000;
