@@ -62,14 +62,9 @@ async function getLatest() {
 // Eldcerust note: Update requested to version FTB Revelation 3.2.0
 // gets a specific frozen version of FTB Revelation
 async function getFtbRevelation() {
-    let $ = cheerio.load(await getPage('https://www.feed-the-beast.com/projects/ftb-revelation/files/2778975'));
-
-    // get the download link
-    const uri = $('.project-file-download-button-large .button').attr('href');
-    const downloadUrl = getUrl(serverBase, uri);
 
     // get the CDN URL (after a HTTP redirect)
-    const cdnUrl = (await httpsGet(downloadUrl)).responseUrl;
+    const cdnUrl = 'https://media.forgecdn.net/files/2778/969/FTBRevelation-3.2.0-1.12.2.zip';
     return cdnUrl;
 }
 // https://www.curseforge.com/minecraft/mc-mods/mcjtylib/files/all
@@ -85,7 +80,9 @@ const mods = [
     { name: 'energy-converters', version: 'energyconverters_1.12.2-1.3.3.19.jar' },
     { name: 'chicken-chunks-1-8', version: 'Chicken Chunks 1.12.2-2.4.2.74-universal' },
     { name: 'compact-machines', version: 'compactmachines3-1.12.2-3.0.18-b278.jar' },
-    { name: 'tiquality', version: 'Tiquality-FAT-1.12.2-GAMMA-1.7.2.jar' }
+    { name: 'tiquality', version: 'Tiquality-FAT-1.12.2-GAMMA-1.7.2.jar' },
+    { name: 'tick-dynamic', version: 'TickDynamic-1.12.2-1.0.2' },
+    { name: 'pvptoggle', version: 'pvpToggle-1.12.1-2.0.38-universal.jar' }
     // { name: 'mekanism' }
 
 
