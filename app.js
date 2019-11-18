@@ -93,15 +93,15 @@ const mods = [
     { name: 'mcjtylib', version: 'McJtyLib - 1.12-3.5.4' },
     { name: 'rftools', version: 'RFTools - 1.12-7.72' },
     { name: 'plustic', version: 'plustic-7.1.6.1.jar' },
-    // { name: 'randompatches', version: 'RandomPatches 1.12.2-1.19.1.1' }, // NOTE: randompatches now a part of FTB Revelation, don't duplicate versions
+    // { name: 'randompatches', version: 'RandomPatches 1.12.2-1.19.1.1' },
     { name: 'mouse-tweaks', version: '[1.12.2] Mouse Tweaks 2.10' },
     { name: 'rftools-dimensions', version: 'RFToolsDimensions - 1.12-5.71' },
     { name: 'energy-converters', version: 'energyconverters_1.12.2-1.3.3.19.jar' },
     { name: 'chicken-chunks-1-8', version: 'Chicken Chunks 1.12.2-2.4.2.74-universal' },
     { name: 'compact-machines', version: 'compactmachines3-1.12.2-3.0.18-b278.jar' },
-    { name: 'tiquality', version: 'Tiquality-FAT-1.12.2-GAMMA-1.7.2.jar' },
-    { name: 'tick-dynamic', version: 'TickDynamic-1.12.2-1.0.2' },
-    { name: 'pvptoggle', version: 'pvpToggle-1.12.1-2.0.38-universal.jar' }
+    { name: 'pvpToggle', version: 'pvpToggle-1.12.1-2.0.38-universal.jar'},
+    { name: 'tick-dynamic', version: 'TickDynamic-1.12.2-1.0.2'},
+    { name: 'easyworldmanager', version: 'EasyWorldManager-1.9-1.12 (1.1.5)'}
     // { name: 'mekanism' }
 
 
