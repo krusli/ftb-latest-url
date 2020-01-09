@@ -95,16 +95,11 @@ const mods = [
     { name: 'plustic', version: 'plustic-7.1.6.1.jar' },
     // { name: 'randompatches', version: 'RandomPatches 1.12.2-1.19.1.1' },
     { name: 'mouse-tweaks', version: '[1.12.2] Mouse Tweaks 2.10' },
-    { name: 'rftools-dimensions', version: 'RFToolsDimensions - 1.12-5.71' },
     { name: 'energy-converters', version: 'energyconverters_1.12.2-1.3.3.19.jar' },
     { name: 'chicken-chunks-1-8', version: 'Chicken Chunks 1.12.2-2.4.2.74-universal' },
-    { name: 'compact-machines', version: 'compactmachines3-1.12.2-3.0.18-b278.jar' },
-    { name: 'pvpToggle', version: 'pvpToggle-1.12.1-2.0.38-universal.jar'}
-    // { name: 'mekanism' }
-
-
-
-
+    { name: 'codechicken-lib-1-8', version: 'CodeChicken Lib 1.12.2-3.2.3.358-universal' },
+    { name: 'flux-networks', version: 'Flux-Networks-1.12.2-4.0.14' },
+    { name: 'laggoggles', version: 'LagGoggles-FAT-1.12.2-4.9.jar' }
 ];
 
 async function getModUrl(mod, nPages, pageNo = 1) {
