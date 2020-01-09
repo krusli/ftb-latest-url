@@ -90,8 +90,6 @@ async function getFtbRevelation() {
 const modsProjects = 'https://www.curseforge.com/minecraft/mc-mods/';
 const modsBase = 'https://www.curseforge.com';
 const mods = [
-    { name: 'mcjtylib', version: 'McJtyLib - 1.12-3.5.4' },
-    { name: 'rftools', version: 'RFTools - 1.12-7.72' },
     { name: 'plustic', version: 'plustic-7.1.6.1.jar' },
     // { name: 'randompatches', version: 'RandomPatches 1.12.2-1.19.1.1' },
     { name: 'mouse-tweaks', version: '[1.12.2] Mouse Tweaks 2.10' },
