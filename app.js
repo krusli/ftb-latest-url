@@ -95,7 +95,8 @@ const mods = [
     { name: 'mouse-tweaks', version: '[1.12.2] Mouse Tweaks 2.10' },
     { name: 'energy-converters', version: 'energyconverters_1.12.2-1.3.3.19.jar' },
     { name: 'flux-networks', version: 'Flux-Networks-1.12.2-4.0.14' },
-    { name: 'laggoggles', version: 'LagGoggles-FAT-1.12.2-4.9.jar' }
+    { name: 'laggoggles', version: 'LagGoggles-FAT-1.12.2-4.9.jar' },
+    { name: 'randompatches', version: 'RandomPatches 1.12.2-1.20.1.0' }
 ];
 
 async function getModUrl(mod, nPages, pageNo = 1) {
