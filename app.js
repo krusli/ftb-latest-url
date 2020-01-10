@@ -96,7 +96,8 @@ const mods = [
     { name: 'energy-converters', version: 'energyconverters_1.12.2-1.3.3.19.jar' },
     { name: 'flux-networks', version: 'Flux-Networks-1.12.2-4.0.14' },
     { name: 'laggoggles', version: 'LagGoggles-FAT-1.12.2-4.9.jar' },
-    { name: 'randompatches', version: 'RandomPatches 1.12.2-1.20.1.0' }
+    { name: 'randompatches', version: 'RandomPatches 1.12.2-1.20.1.0' }.
+    { name: 'mahou-tsukai', version: 'mahoutsukai-1.9.3' }
 ];
 
 async function getModUrl(mod, nPages, pageNo = 1) {
