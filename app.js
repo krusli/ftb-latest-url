@@ -27,10 +27,7 @@ const mods = [
   { projectID: 254818, fileID: 2796426 }, // energyconverters_1.12.2-1.3.3.19.jar
   { projectID: 248020, fileID: 2842381 }, // Flux-Networks-1.12.2-4.0.14
   { projectID: 285612, fileID: 2831330 }, // RandomPatches 1.12.2-1.20.1.0
-
-  // added
-  { projectID: 233105, fileID: 2745846 }, // mcjtylib-1.12-3.5.4.jar
-  { projectID: 224641, fileID: 2672513 }, // rftools-1.12-7.61.jar
+  { projectID: 233105, fileID: 2660396 }, // mcjtylib-1.12-3.1.1.jar
 ];
 
 async function getPage(url) {
