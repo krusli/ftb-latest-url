@@ -6,36 +6,28 @@ const express = require("express");
 
 
 /* Consts */
-const cdnUrlBase = "https://media.forgecdn.net/files/"; // "currying": this string is incomplete, needs the IDs and filename.
+// const cdnUrlBase = "https://media.forgecdn.net/files/"; // "currying": this string is incomplete, needs the IDs and filename.
+// NOTE we now use edge.forgecdn.net too (see examples returned from API):
+// https://edge.forgecdn.net/files/2789/626/plustic-7.1.6.1.jar
+// https://edge.forgecdn.net/files/2671/937/MouseTweaks-2.10-mc1.12.2.jar
+// https://edge.forgecdn.net/files/2796/426/energyconverters_1.12.2-1.3.3.19.jar
+// https://edge.forgecdn.net/files/2842/381/fluxnetworks-1.12.2-4.0.14-31.jar
+// https://edge.forgecdn.net/files/2831/330/randompatches-1.12.2-1.20.1.0.jar
 
-/* Scrapers */
-// https://www.feed-the-beast.com/projects/ftb-revelation/files/2712061 (FTBRevelation-3.0.1-1.12.2.zip)
-// Eldcerust note: Update requested to version FTB Revelation 3.2.0
-// gets a specific frozen version of FTB Revelation
 async function getFtbRevelation() {
-  return "https://media.forgecdn.net/files/2778/975/FTBRevelationServer_3.2.0.zip";
+  // return "https://media.forgecdn.net/files/2778/975/FTBRevelationServer_3.2.0.zip";
+  return "https://media.forgecdn.net/files/2690/320/FTB+Presents+Direwolf20+1.12-1.12.2-2.5.0-Server.zip";
 }
 
-// const modsProjects = 'https://www.curseforge.com/minecraft/mc-mods/';
-// const modsBase = 'https://www.curseforge.com';
-// const mods = [
-//     { name: 'plustic', version: 'plustic-7.1.6.1.jar' },
-//     // { name: 'randompatches', version: 'RandomPatches 1.12.2-1.19.1.1' },
-//     /*
-//     { name: 'mouse-tweaks', version: '[1.12.2] Mouse Tweaks 2.10' },
-//     { name: 'energy-converters', version: 'energyconverters_1.12.2-1.3.3.19.jar' },
-//     { name: 'flux-networks', version: 'Flux-Networks-1.12.2-4.0.14' },
-//     { name: 'laggoggles', version: 'LagGoggles-FAT-1.12.2-4.9.jar' },
-//     { name: 'randompatches', version: 'RandomPatches 1.12.2-1.20.1.0' }
-//     */
-// ];
-
 // 2020-02-28: updated to use API https://twitchappapi.docs.apiary.io/
-
 // same format as manifest.json
 // NOTE we do not used the required arg
 const mods = [
-  { fileID: 2789626, projectID: 260327, required: true } // plustic-7.1.6.1.jar
+  { fileID: 2789626, projectID: 260327, required: true }, // plustic-7.1.6.1.jar
+  { fileID: 2671937, projectID: 60089, required: true }, // [1.12.2] Mouse Tweaks 2.10
+  { fileID: 2796426, projectID: 254818, required: true }, // energyconverters_1.12.2-1.3.3.19.jar
+  { fileID: 2842381, projectID: 248020, required: true }, // Flux-Networks-1.12.2-4.0.14
+  { fileID: 2831330, projectID: 285612, required: true }, // RandomPatches 1.12.2-1.20.1.0
 ];
 
 async function getPage(url) {
@@ -63,15 +55,6 @@ app.get("/", async (req, res) => {
 
 app.get("/mods", async (req, res) => {
     try {
-        // const links = Promise.all(mods.map(async mod => {
-        //     const { projectID, fileID } = mod;
-        //     const response = getApiResponse(projectID, fileID);
-        //     if (response.status != 200) {
-        //         throw Error(`Error fetching mod with projectID: ${projectID} and fileID: ${fileID}, status code: ${response.status}`);
-        //     } else {
-        //         return response.data.downloadUrl;
-        //     }
-        // }));
         const promises = mods.map(async mod => {
             const { projectID, fileID } = mod;
             const response = await getApiResponse(projectID, fileID);
