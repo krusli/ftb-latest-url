@@ -21,22 +21,14 @@ const cdnUrlBase = 'https://media.forgecdn.net/files/'; // "currying": this stri
 /* Utils */
 async function getPage(url) {
     console.log(`Fetching page: ${url}`);
-    // var options = {
-    //     uri: url,
-    //     headers: {
-    //         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101 Firefox/68.0',
-    //         'Accept': '*/*'
-    //     },
-    //     jar: requestModule.jar()
-    // };
-    // const response = await cloudflarescraper.defaults().get(options);
-    const response = await cloudflarescraper
-      .defaults({
-        agentOptions: {
-          ciphers: "ECDHE-ECDSA-AES128-GCM-SHA256"
-        }
-      })
-      .get(url);
+    var options = {
+        uri: url,
+        jar: requestModule.jar()
+    };
+    const response = await cloudflarescraper.defaults().get(options);
+    // const response = await cloudflarescraper
+    //     .defaults()
+    //     .get(url);
     const buffer = new Buffer.from(response, 'binary');
     return buffer.toString();
 }
@@ -124,8 +116,15 @@ const mods = [
 
 async function getModUrl(mod, nPages, pageNo = 1) {
     console.log('getModUrl()', mod.name);
-    const url = `${modsProjects}${mod.name}${mod.version ? `/files/all?page=${pageNo}` : ''}`;
-    // console.log(url);
+    
+    let url;
+    if (pageNo != 1) {
+        url = `${modsProjects}${mod.name}${mod.version ? `/files/all?page=${pageNo}` : ''}`;
+    } else {
+        url = `${modsProjects}${mod.name}${mod.version ? `/files/all` : ''}`;
+    }
+
+    console.log(`url: ${url}`);
     const $ = cheerio.load(await getPage(url));
     // console.log(`Got page for ${mod}`);
 
@@ -207,12 +206,14 @@ async function getModUrl(mod, nPages, pageNo = 1) {
     return await getCdnUrlFromDownloadUrl(downloadPageUrl);
 }
 
+/* Main Application */
+
 const app = express();
 app.use(helmet());
 
 app.get('/', async (req, res) => {
     res.send(await getFtbRevelation());
-})
+});
 
 app.get('/mods', async (req, res) => {
     /*
@@ -238,7 +239,24 @@ app.get('/mods', async (req, res) => {
         } catch (err) {
             console.error(`ERROR fetching mod: ${mod.name}`);
             console.error(err);
-            errors.push({ mod, err });
+
+            let captchaError;
+            captchaError = {};
+            captchaError = {
+                options: err.options,
+                cause: err.cause,
+                response: err.response,
+                errorType: err.errorType,
+                errorTypeDocumentation: `0 if request to page failed due to some native reason as bad url, http connection or so. error in this case will be error event
+1 Cloudflare returned CAPTCHA. Nothing to do here. Bad luck
+2 Cloudflare returned page with some inner error. error will be Number within this range 1012, 1011, 1002, 1000, 1004, 1010, 1006, 1007, 1008. See more here
+3 this error is returned when library failed to parse and solve js challenge. error will be String with some details. ⚠️ ⚠️ Most likely it means that Cloudflare have changed their js challenge.
+4 CF went into a loop and started to return challenge after challenge. If number of solved challenges is greater than 3 and another challenge is returned, throw an error
+See: https://github.com/codemanki/cloudscraper/blob/HEAD/errors.js`
+            };
+
+
+            errors.push({ mod, err, captchaError });
             hasError = true;
         }
         
@@ -248,10 +266,7 @@ app.get('/mods', async (req, res) => {
     } else {
         res.send(links.join("\r\n"));
     }
-
-
-
-})
+});
 
 const port = process.env.PORT || 3000;
 app.listen(port);
