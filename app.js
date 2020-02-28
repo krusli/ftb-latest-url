@@ -22,12 +22,14 @@ const cdnUrlBase = 'https://media.forgecdn.net/files/'; // "currying": this stri
 async function getPage(url) {
     var options = {
         uri: url,
-        headers: {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101 Firefox/68.0',
-        'Accept': '*/*'},
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101 Firefox/68.0',
+            'Accept': '*/*'
+        },
         jar: requestModule.jar()
     };
     const response = await cloudflarescraper.defaults().get(options);
-    const buffer = new Buffer.from(response,'binary');
+    const buffer = new Buffer.from(response, 'binary');
     return buffer.toString();
 }
 
@@ -69,8 +71,8 @@ async function getCdnUrlFromDownloadUrl(downloadPageUrl) {
     let filename = downloadPage$(entries[0]).text();
 
     if (!filename) {
-       elem = downloadPage$(".details-info li:nth-child(1) .overflow-tip"); 
-       filename = downloadPage$(elem).text();
+        elem = downloadPage$(".details-info li:nth-child(1) .overflow-tip");
+        filename = downloadPage$(elem).text();
     }
 
     return getCdnUrl(downloadPageUrl, filename);
@@ -81,39 +83,20 @@ async function getCdnUrlFromDownloadUrl(downloadPageUrl) {
 // Eldcerust note: Update requested to version FTB Revelation 3.2.0
 // gets a specific frozen version of FTB Revelation
 async function getFtbRevelation() {
-    let $ = cheerio.load(await getPage('https://www.feed-the-beast.com/projects/ftb-revelation/files/2778975'));
-
-    // get the download link
-    const uri = $('.project-file-download-button-large .button').attr('href');
-    const downloadUrl = getUrl(serverBase, uri);
-
-    // get the CDN URL (after a HTTP redirect)
-    const downloadLinkUrl = (await httpsGet(downloadUrl)).responseUrl;
-    const split = downloadLinkUrl.split('/');
-    const downloadPageUrl = split.splice(0, split.length - 1).join('/');
-
-    return await getCdnUrlFromDownloadUrl(downloadPageUrl);
+    return 'https://media.forgecdn.net/files/2778/975/FTBRevelationServer_3.2.0.zip';
 }
 
 // https://www.curseforge.com/minecraft/mc-mods/mcjtylib/files/all
 const modsProjects = 'https://www.curseforge.com/minecraft/mc-mods/';
 const modsBase = 'https://www.curseforge.com';
 const mods = [
-    { name: 'mcjtylib', version: 'McJtyLib - 1.12-3.5.4' },
-    { name: 'rftools', version: 'RFTools - 1.12-7.72' },
     { name: 'plustic', version: 'plustic-7.1.6.1.jar' },
-    // { name: 'randompatches', version: 'RandomPatches 1.12.2-1.19.1.1' }, // NOTE: randompatches now a part of FTB Revelation, don't duplicate versions
+    // { name: 'randompatches', version: 'RandomPatches 1.12.2-1.19.1.1' },
     { name: 'mouse-tweaks', version: '[1.12.2] Mouse Tweaks 2.10' },
-    { name: 'rftools-dimensions', version: 'RFToolsDimensions - 1.12-5.71' },
     { name: 'energy-converters', version: 'energyconverters_1.12.2-1.3.3.19.jar' },
-    { name: 'chicken-chunks-1-8', version: 'Chicken Chunks 1.12.2-2.4.2.74-universal' },
-    { name: 'compact-machines', version: 'compactmachines3-1.12.2-3.0.18-b278.jar' },
-    { name: 'tiquality', version: 'Tiquality-FAT-1.12.2-GAMMA-1.7.2.jar' }
-    // { name: 'mekanism' }
-
-
-
-
+    { name: 'flux-networks', version: 'Flux-Networks-1.12.2-4.0.14' },
+    { name: 'laggoggles', version: 'LagGoggles-FAT-1.12.2-4.9.jar' },
+    { name: 'randompatches', version: 'RandomPatches 1.12.2-1.20.1.0' }
 ];
 
 async function getModUrl(mod, nPages, pageNo = 1) {
