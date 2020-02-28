@@ -20,14 +20,17 @@ async function getFtbRevelation() {
 }
 
 // 2020-02-28: updated to use API https://twitchappapi.docs.apiary.io/
-// same format as manifest.json
-// NOTE we do not used the required arg
+// same format as manifest.json (without required key)
 const mods = [
-  { fileID: 2789626, projectID: 260327, required: true }, // plustic-7.1.6.1.jar
-  { fileID: 2671937, projectID: 60089, required: true }, // [1.12.2] Mouse Tweaks 2.10
-  { fileID: 2796426, projectID: 254818, required: true }, // energyconverters_1.12.2-1.3.3.19.jar
-  { fileID: 2842381, projectID: 248020, required: true }, // Flux-Networks-1.12.2-4.0.14
-  { fileID: 2831330, projectID: 285612, required: true }, // RandomPatches 1.12.2-1.20.1.0
+  { projectID: 260327, fileID: 2789626 }, // plustic-7.1.6.1.jar
+  { projectID: 60089, fileID: 2671937 }, // [1.12.2] Mouse Tweaks 2.10
+  { projectID: 254818, fileID: 2796426 }, // energyconverters_1.12.2-1.3.3.19.jar
+  { projectID: 248020, fileID: 2842381 }, // Flux-Networks-1.12.2-4.0.14
+  { projectID: 285612, fileID: 2831330 }, // RandomPatches 1.12.2-1.20.1.0
+
+  // added
+  { projectID: 233105, fileID: 2745846 }, // mcjtylib-1.12-3.5.4.jar
+  { projectID: 224641, fileID: 2672513 }, // rftools-1.12-7.61.jar
 ];
 
 async function getPage(url) {
