@@ -20,18 +20,39 @@ const cdnUrlBase = 'https://media.forgecdn.net/files/'; // "currying": this stri
 
 /* Utils */
 async function getPage(url) {
-    var options = {
-        uri: url,
-        headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101 Firefox/68.0',
-            'Accept': '*/*'
-        },
-        jar: requestModule.jar()
-    };
-    const response = await cloudflarescraper.defaults().get(options);
+    console.log(`Fetching page: ${url}`);
+    // var options = {
+    //     uri: url,
+    //     headers: {
+    //         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101 Firefox/68.0',
+    //         'Accept': '*/*'
+    //     },
+    //     jar: requestModule.jar()
+    // };
+    // const response = await cloudflarescraper.defaults().get(options);
+    const response = await cloudflarescraper
+      .defaults({
+        agentOptions: {
+          ciphers: "ECDHE-ECDSA-AES128-GCM-SHA256"
+        }
+      })
+      .get(url);
     const buffer = new Buffer.from(response, 'binary');
     return buffer.toString();
 }
+
+// async function getPage(url) {
+//     console.log(`Fetching page: ${url}`);
+
+//     const response = await axios.get(url, {
+//         responseType: "arraybuffer"
+//     });
+//     const buffer = new Buffer.from(
+//         response.data,
+//         "binary"
+//     );
+//     return buffer.toString();
+// }
 
 function getUrl(base, uri) {
     return `${base}${uri}`;
@@ -92,16 +113,17 @@ const modsBase = 'https://www.curseforge.com';
 const mods = [
     { name: 'plustic', version: 'plustic-7.1.6.1.jar' },
     // { name: 'randompatches', version: 'RandomPatches 1.12.2-1.19.1.1' },
+    /*
     { name: 'mouse-tweaks', version: '[1.12.2] Mouse Tweaks 2.10' },
     { name: 'energy-converters', version: 'energyconverters_1.12.2-1.3.3.19.jar' },
     { name: 'flux-networks', version: 'Flux-Networks-1.12.2-4.0.14' },
     { name: 'laggoggles', version: 'LagGoggles-FAT-1.12.2-4.9.jar' },
     { name: 'randompatches', version: 'RandomPatches 1.12.2-1.20.1.0' }
+    */
 ];
 
 async function getModUrl(mod, nPages, pageNo = 1) {
-    // console.log('getModUrl()', mod, nPages, pageNo);
-    // console.log('getModUrl()', mod.name);
+    console.log('getModUrl()', mod.name);
     const url = `${modsProjects}${mod.name}${mod.version ? `/files/all?page=${pageNo}` : ''}`;
     // console.log(url);
     const $ = cheerio.load(await getPage(url));
@@ -193,17 +215,42 @@ app.get('/', async (req, res) => {
 })
 
 app.get('/mods', async (req, res) => {
+    /*
     const promises = mods.map(mod => getModUrl(mod));
     const promiseAll = Promise.all(promises);
-    const links = await promiseAll;
+    try {
+        const links = await promiseAll;
+        res.send(links.join("\r\n"));
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(err);
+    }
+    */
+    let hasError = false;
+    let errors = [];
+    const links = [];
+    for (let i = 0; i < mods.length; i++) {
+        let mod = mods[i];
+        // const link = await getModUrl(mods[i]);
+        try {
+            let link = await getModUrl(mod);
+            links.push(link);
+        } catch (err) {
+            console.error(`ERROR fetching mod: ${mod.name}`);
+            console.error(err);
+            errors.push({ mod, err });
+            hasError = true;
+        }
+        
+    }
+    if (hasError) {
+        res.status(500).send(errors);
+    } else {
+        res.send(links.join("\r\n"));
+    }
 
-    // const links = [];
-    // for (let i = 0; i < mods.length; i++) {
-    //     const link = await getModUrl(mods[i]);
-    //     links.push(link);
-    // }
 
-    res.send(links.join('\r\n'));
+
 })
 
 const port = process.env.PORT || 3000;
