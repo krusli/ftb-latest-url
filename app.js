@@ -4,7 +4,6 @@ const axios = require("axios");
 const helmet = require("helmet");
 const express = require("express");
 
-
 /* Consts */
 // const cdnUrlBase = "https://media.forgecdn.net/files/"; // "currying": this string is incomplete, needs the IDs and filename.
 // NOTE we now use edge.forgecdn.net too (see examples returned from API):
@@ -19,8 +18,13 @@ async function getFtbRevelation() {
   return "https://media.forgecdn.net/files/2690/320/FTB+Presents+Direwolf20+1.12-1.12.2-2.5.0-Server.zip";
 }
 
+async function getSF4() {
+  return "https://media.forgecdn.net/files/2787/18/SkyFactory_4_Server_4.1.0.zip";
+}
+
 // 2020-02-28: updated to use API https://twitchappapi.docs.apiary.io/
 // same format as manifest.json (without required key)
+/*
 const mods = [
   { projectID: 260327, fileID: 2789626 }, // plustic-7.1.6.1.jar
   { projectID: 60089, fileID: 2671937 }, // [1.12.2] Mouse Tweaks 2.10
@@ -29,6 +33,8 @@ const mods = [
   { projectID: 285612, fileID: 2831330 }, // RandomPatches 1.12.2-1.20.1.0
   { projectID: 233105, fileID: 2660396 }, // mcjtylib-1.12-3.1.1.jar
 ];
+*/
+const mods = [];
 
 async function getPage(url) {
   console.log(`Fetching page: ${url}`);
@@ -50,7 +56,12 @@ const app = express();
 app.use(helmet());
 
 app.get("/", async (req, res) => {
-  res.send(await getFtbRevelation());
+//   res.send(await getFtbRevelation());
+  res.send(await getSF4());
+});
+
+app.get("/packs/sf4", async (req, res) => {
+  res.send(await getSF4());
 });
 
 app.get("/mods", async (req, res) => {
