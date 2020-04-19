@@ -64,12 +64,8 @@ const app = express();
 app.use(helmet());
 
 app.get("/", async (req, res) => {
-//   res.send(await getFtbRevelation());
-  res.send(await getSF4());
-});
-
-app.get("/packs/sf4", async (req, res) => {
-  res.send(await getSF4());
+  res.send(await getFtbRevelation());
+  // res.send(await getSF4());
 });
 
 app.get("/mods", async (req, res) => {
