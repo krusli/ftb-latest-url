@@ -34,7 +34,15 @@ const mods = [
   { projectID: 233105, fileID: 2660396 }, // mcjtylib-1.12-3.1.1.jar
 ];
 */
-const mods = [];
+
+// 2020-04-19: DW20 build
+const mods = [
+  { projectID: 260327, fileID: 2789626 }, // plustic-7.1.6.1.jar
+  { projectID: 254818, fileID: 2796426 }, // energyconverters_1.12.2-1.3.3.19.jar
+  { projectID: 248020, fileID: 2842381 }, // Flux-Networks-1.12.2-4.0.14
+  { projectID: 285612, fileID: 2831330 }, // RandomPatches 1.12.2-1.20.1.0
+  { projectID: 253619, fileID: 2899820 }, // realfilingcabinet-1.12-0.2.0.21.jar
+];
 
 async function getPage(url) {
   console.log(`Fetching page: ${url}`);
