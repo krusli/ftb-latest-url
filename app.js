@@ -42,6 +42,7 @@ const mods = [
   { projectID: 248020, fileID: 2842381 }, // Flux-Networks-1.12.2-4.0.14
   { projectID: 285612, fileID: 2831330 }, // RandomPatches 1.12.2-1.20.1.0
   { projectID: 253619, fileID: 2899820 }, // realfilingcabinet-1.12-0.2.0.21.jar
+  { projectID: 342543, fileID: 2941698 }, // mahoutsukai-1.12.2-v1.16.0.jar
 ];
 
 async function getPage(url) {
