@@ -84,6 +84,7 @@ app.get("/mods", async (req, res) => {
 
         const links = await Promise.all(promises);
 
+        res.type('txt');
         res.send(links.join("\r\n"));
     } catch (e) {
         console.error(e);
